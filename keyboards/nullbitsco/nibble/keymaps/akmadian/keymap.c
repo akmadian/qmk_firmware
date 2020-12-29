@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "micro_oled.h"
 
 #define _BASE     0
 #define _VIA1     1
@@ -23,8 +24,30 @@
 
 #define TAPPING_TERM 150
 
+#define MATRIX_DISPLAY_X 5
+#define MATRIX_DISPLAY_Y 16
+#define LOCK_DISPLAY_X 45
+#define LOCK_DISPLAY_Y 18
+#define MOD_DISPLAY_X 74
+#define MOD_DISPLAY_Y 18
+#define LAYER_DISPLAY_X 39
+#define LAYER_DISPLAY_Y 0
+#define ENC_DISPLAY_X 86
+#define ENC_DISPLAY_Y 0
+
+bool led_numlock = false;
+bool led_capslock = false;
+bool led_scrolllock = false;
+uint8_t layer;
+
+
 enum custom_keycodes {
-  OLED_TOGGLE = SAFE_RANGE
+  OLED_TOGGLE = SAFE_RANGE,
+  LI, // LinkedIn
+  GH, // GitHub
+  WS, // Website
+  PN, // Phone Number
+  EM  // Email Address
 };
 
 bool m_oled_on = true;
@@ -47,9 +70,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 	[_VIA1] = LAYOUT_ansi(
              KC_TRNS, KC_F1,   KC_F2,   KC_F3,  KC_F4, KC_F5, KC_F6,   KC_F7,   KC_F8,   KC_F9, KC_F10, KC_F11, KC_F12, KC_HOME, KC_INS, 
-    RGB_TOG, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, OLED_TOGGLE, KC_POWER, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_WH_D, KC_WH_L, KC_WH_R, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
+    RGB_TOG, KC_TRNS, KC_TRNS, WS, EM, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, OLED_TOGGLE, KC_POWER, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, GH, KC_WH_D, KC_WH_L, KC_WH_R, LI, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, PN, KC_TRNS, KC_WH_L, KC_WH_R, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MPRV, KC_MPLY, KC_MNXT
   ),
 };
@@ -85,10 +108,26 @@ void oled_task_user(void) {
 
       led_t led_state = host_keyboard_led_state();
       oled_write_P(led_state.caps_lock ? PSTR("CAPS") : PSTR("    "), false);
+
+      draw_string(LAYER_DISPLAY_X, LAYER_DISPLAY_Y + 2, "LAYER", PIXEL_ON, NORM, 0);
+      draw_rect_filled_soft(LAYER_DISPLAY_X + 31, LAYER_DISPLAY_Y, 11, 11, PIXEL_ON, NORM);
+      draw_char(LAYER_DISPLAY_X + 34, LAYER_DISPLAY_Y + 2, layer + 0x30, PIXEL_ON, XOR, 0);
     } else {
       oled_off();
     }
 }
+
+void init_oled(void) {
+    clear_buffer();
+    draw_keyboard_layer();
+}
+
+void draw_display(void) {
+    draw_keyboard_layer();
+    send_buffer();
+}
+
+
 
 void encoder_update_kb(uint8_t index, bool clockwise) {
   if (layer_state_is(0)) {
@@ -131,24 +170,36 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       m_oled_on = !m_oled_on;
     }
     break;
+    case LI:
+    if (record->event.pressed) {
+      SEND_STRING("https://www.linkedin.com/in/arimadian/");
+    }
+    break;
+    case GH:
+    if (record->event.pressed) {
+      SEND_STRING("https://github.com/akmadian");
+    }
+    break;
+    case WS:
+    if (record->event.pressed) {
+      SEND_STRING("https://arimadian.info/");
+    }
+    break;
+    case PN:
+    if (record->event.pressed) {
+      SEND_STRING("2532496636");
+    }
+    break;
+    case EM:
+    if (record->event.pressed) {
+      SEND_STRING("akmadian@gmail.com");
+    }
+    break;
   }
   return true;
 }
 
-/*
-void matrix_init_user(void) {
-  // Initialize remote keyboard, if connected (see readme)
-  matrix_init_remote_kb();
+void raw_hid_receive(uint8_t *data, uint8_t length) 
+{
+    oled_write_ln((char *)data, false);
 }
-
-void matrix_scan_user(void) {
-  // Scan and parse keystrokes from remote keyboard, if connected (see readme)
-  matrix_scan_remote_kb();
-  if (is_alt_tab_active) {
-    if (timer_elapsed(alt_tab_timer) > 1000) {
-      unregister_code(KC_LALT);
-      is_alt_tab_active = false;
-    }
-  }
-}
-*/
