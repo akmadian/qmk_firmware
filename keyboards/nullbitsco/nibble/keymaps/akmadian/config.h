@@ -18,3 +18,8 @@
 // Custom config Usage:
 // 1 for enabled encoder modes (1 byte)
 // 6 for 3x custom encoder settings, left, right, and press (18 bytes)
+//
+#undef I2C_ADDRESS_SA0_1
+#define I2C_ADDRESS_SA0_1 0b0111100
+#define LCDWIDTH 128
+#define LCDHEIGHT 32
