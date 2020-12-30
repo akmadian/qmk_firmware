@@ -22,43 +22,41 @@
 
 #define MATRIX_DISPLAY_X 0
 #define MATRIX_DISPLAY_Y 16
-#define LOCK_DISPLAY_X 45
-#define LOCK_DISPLAY_Y 18
-#define MOD_DISPLAY_X 74
+#define LOCK_DISPLAY_X 105
+#define LOCK_DISPLAY_Y 0
+#define MOD_DISPLAY_X 45
 #define MOD_DISPLAY_Y 18
 #define LAYER_DISPLAY_X 39
 #define LAYER_DISPLAY_Y 0
 #define ENC_DISPLAY_X 86
 #define ENC_DISPLAY_Y 0
 
-bool led_numlock = false;
-bool led_capslock = false;
-bool led_scrolllock = false;
-
 bool oled_off = false;
-uint8_t enc_mode = 0;
-char *enc_str[] = {"VOL", "SCR", "BRT"};
-uint16_t enc_keys[2][3] = {
-    { KC_AUDIO_VOL_UP, KC_UP, KC_BRIGHTNESS_UP },
-    { KC_AUDIO_VOL_DOWN, KC_DOWN, KC_BRIGHTNESS_DOWN }
-};
-
 bool send_oled = false;
+
+enum custom_keycodes {
+    OLED_TOGGLE = SAFE_RANGE,
+    LI,
+    GH,
+    WS,
+    PN,
+    EM
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_BASE] = LAYOUT_ansi(
-             KC_ESC , KC_1,    KC_2,    KC_3,   KC_4,  KC_5,  KC_6,    KC_7,    KC_8,    KC_9, KC_0, KC_MINS, KC_EQL, KC_BSPC, KC_GRV, 
-    KC_MUTE, KC_TAB , KC_Q,    KC_W,    KC_E,   KC_R,  KC_T,  KC_Y,    KC_U,    KC_I,    KC_O, KC_P, KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL, 
-    MO(1)  , KC_CAPS, KC_A,    KC_S,    KC_D,   KC_F,  KC_G,  KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT, KC_ENT, KC_HOME, 
-    MO(2)  , KC_LSFT, KC_Z,    KC_X,    KC_C,   KC_V,  KC_B,  KC_N,    KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, KC_UP, KC_END, 
-    MO(3)  , KC_LCTL, KC_LGUI, KC_LALT,                KC_SPC,                  KC_RALT, KC_NO, KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
+             KC_ESC , KC_1,    KC_2,    KC_3,   KC_4,  KC_5,  KC_6,    KC_7,    KC_8,    KC_9,   KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_GRV,
+    KC_MUTE, KC_TAB , KC_Q,    KC_W,    KC_E,   KC_R,  KC_T,  KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL,
+    MO(1)  , KC_CAPS, KC_A,    KC_S,    KC_D,   KC_F,  KC_G,  KC_H,    KC_J,    KC_K,    KC_L,   KC_SCLN, KC_QUOT,          KC_ENT,  KC_HOME,
+    MO(2)  , KC_LSFT, KC_Z,    KC_X,    KC_C,   KC_V,  KC_B,  KC_N,    KC_M,    KC_COMM, KC_DOT, KC_SLSH,          KC_RSFT, KC_UP,   KC_END,
+    MO(3)  , KC_LCTL, KC_LGUI, KC_LALT,                KC_SPC,                  KC_RALT, KC_NO,  KC_RCTL,            KC_LEFT, KC_DOWN, KC_RGHT
   ),
   [_VIA1] = LAYOUT_ansi(
-             KC_TRNS, KC_F1,   KC_F2,   KC_F3,  KC_F4, KC_F5, KC_F6,   KC_F7,   KC_F8,   KC_F9, KC_F10, KC_F11, KC_F12, KC_HOME, KC_INS, 
-    RGB_TOG, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_POWER, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, KC_TRNS, KC_WH_D, KC_WH_L, KC_WH_R, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_WH_L, KC_WH_R, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MPRV, KC_MPLY, KC_MNXT
+             KC_TRNS, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,   KC_F11,  KC_F12,  KC_HOME, KC_INS,
+    RGB_TOG, KC_TRNS, KC_TRNS, WS,      EM,      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_POWER, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, GH,      KC_TRNS, KC_TRNS, KC_TRNS, LI,      KC_TRNS,  KC_TRNS,          KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, PN,      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,           KC_TRNS, KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                KC_TRNS,                      KC_TRNS, KC_TRNS, KC_TRNS,           KC_MPRV, KC_MPLY, KC_MNXT
   ),
 };
 
@@ -84,9 +82,8 @@ void draw_keyboard_locks(void) {
     if (led_state.caps_lock) {
         draw_rect_filled_soft(LOCK_DISPLAY_X + 0, LOCK_DISPLAY_Y, 5 + (3 * 6), 11, PIXEL_ON, NORM);
         draw_string(LOCK_DISPLAY_X + 3, LOCK_DISPLAY_Y +2, "CAP", PIXEL_OFF, NORM, 0);
-    } else if (led_capslock == false) {
+    } else {
         draw_rect_filled_soft(LOCK_DISPLAY_X + 0, LOCK_DISPLAY_Y, 5 + (3 * 6), 11, PIXEL_OFF, NORM);
-        draw_rect_soft(LOCK_DISPLAY_X + 0, LOCK_DISPLAY_Y, 5 + (3 * 6), 11, PIXEL_ON, NORM);
         draw_string(LOCK_DISPLAY_X + 3, LOCK_DISPLAY_Y +2, "CAP", PIXEL_ON, NORM, 0);
     }
 }
@@ -96,27 +93,24 @@ void draw_keyboard_mods(void) {
 
     if (mods & MOD_MASK_SHIFT) {
         draw_rect_filled_soft(MOD_DISPLAY_X + 0, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 3, MOD_DISPLAY_Y + 2, "S", PIXEL_OFF, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 2, MOD_DISPLAY_Y + 2, "S", PIXEL_OFF, NORM, 0);
     } else {
         draw_rect_filled_soft(MOD_DISPLAY_X + 0, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_OFF, NORM);
-        draw_rect_soft(MOD_DISPLAY_X + 0, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 3, MOD_DISPLAY_Y + 2, "S", PIXEL_ON, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 2, MOD_DISPLAY_Y + 2, "S", PIXEL_ON, NORM, 0);
     }
     if (mods & MOD_MASK_CTRL) {
         draw_rect_filled_soft(MOD_DISPLAY_X + 14, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 17, MOD_DISPLAY_Y + 2, "C", PIXEL_OFF, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 16, MOD_DISPLAY_Y + 2, "C", PIXEL_OFF, NORM, 0);
     } else {
         draw_rect_filled_soft(MOD_DISPLAY_X + 14, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_OFF, NORM);
-        draw_rect_soft(MOD_DISPLAY_X + 14, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 17, MOD_DISPLAY_Y + 2, "C", PIXEL_ON, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 16, MOD_DISPLAY_Y + 2, "C", PIXEL_ON, NORM, 0);
     }
     if (mods & MOD_MASK_ALT) {
         draw_rect_filled_soft(MOD_DISPLAY_X + 28, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 31, MOD_DISPLAY_Y + 2, "A", PIXEL_OFF, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 30, MOD_DISPLAY_Y + 2, "A", PIXEL_OFF, NORM, 0);
     } else {
         draw_rect_filled_soft(MOD_DISPLAY_X + 28, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_OFF, NORM);
-        draw_rect_soft(MOD_DISPLAY_X + 28, MOD_DISPLAY_Y, 5 + (1 * 6), 11, PIXEL_ON, NORM);
-        draw_string(MOD_DISPLAY_X + 31, MOD_DISPLAY_Y + 2, "A", PIXEL_ON, NORM, 0);
+        draw_string(MOD_DISPLAY_X + 30, MOD_DISPLAY_Y + 2, "A", PIXEL_ON, NORM, 0);
     }
 }
 
@@ -185,6 +179,38 @@ void matrix_scan_kb(void) {
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     send_oled = true;
     return process_record_user(keycode, record);
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  process_record_remote_kb(keycode, record);
+  switch(keycode) {
+    case LI:
+    if (record->event.pressed) {
+      SEND_STRING("https://www.linkedin.com/in/arimadian/");
+    }
+    break;
+    case GH:
+    if (record->event.pressed) {
+      SEND_STRING("https://github.com/akmadian");
+    }
+    break;
+    case WS:
+    if (record->event.pressed) {
+      SEND_STRING("https://arimadian.info/");
+    }
+    break;
+    case PN:
+    if (record->event.pressed) {
+      SEND_STRING("2532496636");
+    }
+    break;
+    case EM:
+    if (record->event.pressed) {
+      SEND_STRING("akmadian@gmail.com");
+    }
+    break;
+  }
+  return true;
 }
 
 void keyboard_post_init_user(void) {
