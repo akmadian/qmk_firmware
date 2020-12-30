@@ -18,7 +18,7 @@
 
 #define _BASE     0
 #define _VIA1     1
-
+#define _VIA2     2
 
 #define MATRIX_DISPLAY_X 0
 #define MATRIX_DISPLAY_Y 16
@@ -53,10 +53,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
   [_VIA1] = LAYOUT_ansi(
              KC_TRNS, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,   KC_F11,  KC_F12,  KC_HOME, KC_INS,
-    RGB_TOG, KC_TRNS, KC_TRNS, WS,      EM,      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_POWER, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+    RGB_TOG, KC_TRNS, KC_TRNS, WS,      EM,      RGB_M_R, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_POWER, KC_PWR, KC_TRNS, KC_TRNS, KC_TRNS,
     KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, GH,      KC_TRNS, KC_TRNS, KC_TRNS, LI,      KC_TRNS,  KC_TRNS,          KC_TRNS, KC_TRNS,
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, PN,      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,           KC_TRNS, KC_TRNS, KC_TRNS,
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                KC_TRNS,                      KC_TRNS, KC_TRNS, KC_TRNS,           KC_MPRV, KC_MPLY, KC_MNXT
+  ),
+  [_VIA2] = LAYOUT_ansi(
+             KC_TRNS, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,   KC_F11,  KC_F12,  KC_HOME, KC_INS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RESET,   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_POWER, KC_PWR,  KC_TRNS, KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_SLEP, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,          KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,           KC_TRNS, KC_TRNS, KC_TRNS,
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                KC_TRNS,                      KC_TRNS, KC_TRNS, KC_TRNS,           KC_TRNS, KC_TRNS, KC_TRNS
   ),
 };
 
@@ -142,7 +149,7 @@ void draw_encoder(int8_t startX, int8_t startY, bool show_legend){
       mode_string = "RGB";
       break;
     case 2:
-      mode_string = "UDF";
+      mode_string = "SYS";
       break;
     case 3:
       mode_string = "UDF";
@@ -247,6 +254,13 @@ void encoder_update_kb(uint8_t index, bool clockwise) {
                     rgblight_step_reverse();
                 }
             }
+            }
+            break;
+        case 2:
+            if (clockwise) {
+                tap_code(KC_BRIGHTNESS_UP);
+            } else {
+                tap_code(KC_BRIGHTNESS_DOWN);
             }
             break;
     }

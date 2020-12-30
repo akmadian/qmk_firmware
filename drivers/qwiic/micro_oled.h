@@ -30,6 +30,7 @@
 #pragma once
 
 #include "qwiic.h"
+#include <stdbool.h>
 
 void micro_oled_init(void);
 
